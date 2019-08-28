@@ -79,26 +79,26 @@ public:
 };
 
 
-
-USTRUCT(BlueprintType)
-struct FCharacterSkillAnimData
-{
-	GENERATED_BODY()
-public:
-
-	FCharacterStaticData() {}
-	FCharacterStaticData(FCharacterDataRow& InData)
-	: Data(InData) {}
-	
-	UPROPERTY(BlueprintReadOnly)
-	FCharacterDataRow Data;
-
-	UPROPERTY(BlueprintReadOnly)
-	TMap<int32, FCharacterLevelDataRow> LevelData;
-
-	UPROPERTY(BlueprintReadOnly)
-	FName ParentID;
-};
+// 
+// USTRUCT(BlueprintType)
+// struct FCharacterSkillAnimData
+// {
+// 	GENERATED_BODY()
+// public:
+// 
+// 	FCharacterStaticData() {}
+// 	FCharacterStaticData(FCharacterDataRow& InData)
+// 	: Data(InData) {}
+// 	
+// 	UPROPERTY(BlueprintReadOnly)
+// 	FCharacterDataRow Data;
+// 
+// 	UPROPERTY(BlueprintReadOnly)
+// 	TMap<int32, FCharacterLevelDataRow> LevelData;
+// 
+// 	UPROPERTY(BlueprintReadOnly)
+// 	FName ParentID;
+// };
 
 
 USTRUCT(BlueprintType)
@@ -120,7 +120,7 @@ USTRUCT(BlueprintType)
 struct FSkillEffectDataRow : public FTableRowBase
 {
 public:
-	
+	GENERATED_BODY()
 
 };
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Tickable.h"
+#include "Common.h"
 #include "CombatManager.generated.h"
 
 class ASFCharacter;
@@ -44,11 +45,11 @@ class SOCKETFIGHTERS_API UCombatManager : public UObject, public FTickableGameOb
 	GENERATED_BODY()
 public:
 
-	UFUNCTION(BlueprintCallable)
-	void InitCombat(FCharacterInstanceData MyInfo);
+	//UFUNCTION(BlueprintCallable)
+	//void InitCombat(FCharacterInstanceData MyInfo);
 
-	UFUNCTION(BlueprintCallable)
-	void ActivateSkill(AActor* InCharacter);
+	//UFUNCTION(BlueprintCallable)
+	//void ActivateSkill(AActor* InCharacter);
 
 	UFUNCTION(BlueprintCallable)
 	void TriggerSkillSequence(AActor* InCharacter);

@@ -16,7 +16,7 @@ TStatId UCombatManager::GetStatId() const
 }
 
 
-void UCombatManager::TriggerSkillEffect(AActor* InCharacter)
+void UCombatManager::TriggerSkillSequence(AActor* InCharacter)
 {
 
 }
