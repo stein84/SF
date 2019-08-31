@@ -53,8 +53,10 @@ void UStaticDataAccessor::InitStaticData()
 	MainSkillTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/MainSkillTable.MainSkillTable"));
 	SocketSkillTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/SocketSkillTable.SocketSkillTable"));
 	BeltTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/BeltTable.BeltTable"));
-
+	NPCTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/NPCTable.NPCTable"));
+	StageTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/StageTable.StageTable"));
 }
+
 
 FCharacterStaticData UStaticDataAccessor::GetCharacterData_BP(FName InID)
 {
@@ -109,6 +111,18 @@ FSocketSkillDataRow* UStaticDataAccessor::GetSocketSkillData(FName InID)
 FBeltDataRow* UStaticDataAccessor::GetBeltData(FName InID)
 {
 	return BeltTable->FindRow<FBeltDataRow>(InID, nullptr);
+}
+
+
+FNPCDataRow* UStaticDataAccessor::GetNPCData(FName InID)
+{
+	return NPCTable->FindRow<FNPCDataRow>(InID, nullptr);
+}
+
+
+FStageDataRow* UStaticDataAccessor::GetStageData(FName InID)
+{
+	return StageTable->FindRow<FStageDataRow>(InID, nullptr);
 }
 
 

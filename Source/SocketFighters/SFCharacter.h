@@ -27,4 +27,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	
+
+public:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<FName, class UAnimMontage*> SkillAnims;
 };

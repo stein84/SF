@@ -45,3 +45,15 @@ void USFGameInstanceSubsystem::LoadAccountInfo()
 	GDATA->AccountInfo = AccountInfo;
 	GDATA->bAccountInfoValid = true;
 }
+
+
+void USFGameInstanceSubsystem::EnterStage(FName InStageID)
+{
+	StageID = InStageID;
+
+	auto StageData = GDATA->GetStageData(InStageID);
+	ensure(StageData != nullptr);
+
+	UGameplayStatics::OpenLevel(this, StageData->MapName);
+}
+

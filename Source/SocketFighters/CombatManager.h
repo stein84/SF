@@ -19,6 +19,10 @@ class ASFCharacter;
  */
 
 
+// 캐릭터 인스턴스 / NPC 정보를 통해 초기화한다
+// 스킬 정보는 들고있을 필요 없고, 벨트에 실제 등록된 애들의 스태틱 데이터만을 가져온다
+
+
 USTRUCT(BlueprintType)
 struct FCharacterCombatData
 {
@@ -29,12 +33,21 @@ public:
 	ASFCharacter* Character;
 
 	UPROPERTY(BlueprintReadWrite)
-	FCharacterInstanceData InstanceData;
+	int32 MaxHP;
 
 	UPROPERTY(BlueprintReadWrite)
-	float CurrentHP;
+	int32 HP;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 ATK;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 DEF;
 
 	// 현재 버프 관련 데이터도 추가 
+
+	// 현재 스킬 관련 , 시퀀스 카운터
+
 };
 
 
@@ -45,14 +58,20 @@ class SOCKETFIGHTERS_API UCombatManager : public UObject, public FTickableGameOb
 	GENERATED_BODY()
 public:
 
-	//UFUNCTION(BlueprintCallable)
-	//void InitCombat(FCharacterInstanceData MyInfo);
-
-	//UFUNCTION(BlueprintCallable)
-	//void ActivateSkill(AActor* InCharacter);
+	UFUNCTION(BlueprintCallable)
+	void InitMyCharacter(int64 CharacterUID);
 
 	UFUNCTION(BlueprintCallable)
-	void TriggerSkillSequence(AActor* InCharacter);
+	void InitEnemyCharacter(FName NPCID);
+
+	UFUNCTION(BlueprintCallable)
+	void ActivateSkill(ASFCharacter* InCharacter);
+
+
+	UFUNCTION(BlueprintCallable)
+	void TriggerSkillSequence(ASFCharacter* InCharacter);
+	
+	FCharacterCombatData& GetCombatData(ASFCharacter* InCharacter);
 
 
 	// Begin FTickableGameObject implementation

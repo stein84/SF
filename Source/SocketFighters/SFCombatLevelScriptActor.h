@@ -7,9 +7,8 @@
 #include "Common.h"
 #include "SFCombatLevelScriptActor.generated.h"
 
-/**
- * 
- */
+class ASFCharacter;
+
 UCLASS()
 class SOCKETFIGHTERS_API ASFCombatLevelScriptActor : public ALevelScriptActor
 {
@@ -17,8 +16,10 @@ class SOCKETFIGHTERS_API ASFCombatLevelScriptActor : public ALevelScriptActor
 public:
 	
 	UFUNCTION(BlueprintCallable)
-	void SpawnCharacter(FCharacterInstanceData InData);
+	ASFCharacter* SpawnCharacter(FCharacterInstanceData InData);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	ASFCharacter* TestSpawnBIE(FCharacterInstanceData InData);
 
 
 public:	

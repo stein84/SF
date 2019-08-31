@@ -79,26 +79,6 @@ public:
 };
 
 
-// 
-// USTRUCT(BlueprintType)
-// struct FCharacterSkillAnimData
-// {
-// 	GENERATED_BODY()
-// public:
-// 
-// 	FCharacterStaticData() {}
-// 	FCharacterStaticData(FCharacterDataRow& InData)
-// 	: Data(InData) {}
-// 	
-// 	UPROPERTY(BlueprintReadOnly)
-// 	FCharacterDataRow Data;
-// 
-// 	UPROPERTY(BlueprintReadOnly)
-// 	TMap<int32, FCharacterLevelDataRow> LevelData;
-// 
-// 	UPROPERTY(BlueprintReadOnly)
-// 	FName ParentID;
-// };
 
 
 USTRUCT(BlueprintType)
@@ -121,8 +101,17 @@ struct FSkillEffectDataRow : public FTableRowBase
 {
 public:
 	GENERATED_BODY()
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Param1;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Param2;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Param3;
 };
+
 
 USTRUCT(BlueprintType)
 struct FMainSkillDataRow : public FTableRowBase
@@ -184,6 +173,83 @@ public:
 	int32 Class;
 };
 
+
+USTRUCT(BlueprintType)
+struct FNPCSkillData
+{
+public:
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName SkillID;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 SkillLevel;
+};
+
+
+USTRUCT(BlueprintType)
+struct FNPCSkillComboData
+{
+public:
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TMap<int32, FNPCSkillData> SkillCombo;
+};
+
+
+USTRUCT(BlueprintType)
+struct FNPCDataRow : public FTableRowBase
+{
+public:
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Name;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Description;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 Level;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 HP;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 ATK;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 DEF;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FNPCSkillComboData> SkillSets;
+};
+
+
+
+USTRUCT(BlueprintType)
+struct FStageDataRow : public FTableRowBase
+{
+public:
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Name;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText Description;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 Level;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FName> NPCSet;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName MapName;
+};
 
 
 
@@ -343,6 +409,8 @@ public:
 	FMainSkillDataRow* GetMainSkillData(FName InID);
 	FSocketSkillDataRow* GetSocketSkillData(FName InID);
 	FBeltDataRow* GetBeltData(FName InID);
+	FNPCDataRow* GetNPCData(FName InID);
+	FStageDataRow* GetStageData(FName InID);
 	
 private:
 	void InitStaticData();
@@ -357,6 +425,11 @@ public:
 	UDataTable* BeltTable;
 	UPROPERTY(BlueprintReadOnly)
 	TMap<FName, FCharacterStaticData> CharStaticDataMap;
+	
+	UPROPERTY(BlueprintReadOnly)
+	UDataTable* NPCTable;
+	UPROPERTY(BlueprintReadOnly)
+	UDataTable* StageTable;
 
 	UPROPERTY(BlueprintReadOnly)
 	class USFAccountInfo* AccountInfo;

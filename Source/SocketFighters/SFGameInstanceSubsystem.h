@@ -18,6 +18,13 @@ class SOCKETFIGHTERS_API USFGameInstanceSubsystem : public UGameInstanceSubsyste
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void EnterStage(FName InStageID);
+
+	UFUNCTION(BlueprintPure)
+	FName GetCurrentStageID() { return StageID;  }
+
 
 private:
 	void InitializeStaticData();
@@ -30,7 +37,11 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	USFAccountInfo* AccountInfo;
 
+
+
 private:
 
 	static const FString SaveSlotName;
+
+	FName StageID;
 };

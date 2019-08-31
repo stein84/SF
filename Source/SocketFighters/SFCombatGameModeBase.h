@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Common.h"
 #include "SocketFightersGameModeBase.h"
 #include "SFCombatGameModeBase.generated.h"
 
@@ -29,6 +30,8 @@
 
  */
 
+class ASFCharacter;
+
 UCLASS(Blueprintable)
 class SOCKETFIGHTERS_API ASFCombatGameModeBase : public ASocketFightersGameModeBase
 {
@@ -43,12 +46,13 @@ public:
 private:
 	void InitCharacter();
 
-	void SpawnCharacter();
-
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	class UCombatManager* CombatManager;
+
+	UPROPERTY(BlueprintReadWrite)
+	FStageDataRow MyStageData;
 
 	UPROPERTY(BlueprintReadWrite)
 	FCharacterInstanceData MyCharacterData;
@@ -56,4 +60,12 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	class ASFCombatLevelScriptActor* MyLevelScript;
 
+	UPROPERTY(BlueprintReadWrite)
+	class USFGameInstanceSubsystem* MyGameInstance;
+
+	UPROPERTY(BlueprintReadWrite)
+	ASFCharacter* MyCharacter;
+
+	UPROPERTY(BlueprintReadWrite)
+	ASFCharacter* EnemyCharacter;
 };

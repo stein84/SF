@@ -4,9 +4,7 @@
 #include "SFCombatLevelScriptActor.h"
 
 
-void ASFCombatLevelScriptActor::SpawnCharacter(FCharacterInstanceData InData)
+ASFCharacter* ASFCombatLevelScriptActor::SpawnCharacter(FCharacterInstanceData InData)
 {
-	//SpawnCharacter()
-
-	//TestPlayerStart
+	return TestSpawnBIE(InData);
 }

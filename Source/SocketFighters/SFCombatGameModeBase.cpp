@@ -6,6 +6,8 @@
 #include "SFAccountInfo.h"
 #include "Common.h"
 #include "SFCombatLevelScriptActor.h"
+#include "SFGameInstanceSubsystem.h"
+#include "GameFramework/Actor.h"
 
 
 ASFCombatGameModeBase::ASFCombatGameModeBase(const FObjectInitializer& ObjectInitializer)
@@ -23,6 +25,10 @@ void ASFCombatGameModeBase::StartPlay()
 	MyLevelScript = Cast<ASFCombatLevelScriptActor>(GetWorld()->GetLevelScriptActor());
 	ensure(MyLevelScript != nullptr);
 
+	MyGameInstance = GetGameInstance()->GetSubsystem<USFGameInstanceSubsystem>();
+	MyStageData = *(GDATA->GetStageData(MyGameInstance->GetCurrentStageID()));
+	ensure(MyGameInstance != nullptr);
+
 	InitCharacter();
 }
 
@@ -33,10 +39,5 @@ void ASFCombatGameModeBase::InitCharacter()
 	MyCharacterData = GDATA->AccountInfo->GetSelectedCharacterData();
 
 
-}
-
-
-void ASFCombatGameModeBase::SpawnCharacter()
-{
-	MyLevelScript->SpawnCharacter(MyCharacterData);
+	MyCharacter = MyLevelScript->SpawnCharacter(MyCharacterData);
 }
