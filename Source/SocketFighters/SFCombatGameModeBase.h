@@ -32,6 +32,41 @@
 
 class ASFCharacter;
 
+
+USTRUCT(BlueprintType)
+struct FCombatCharacterData
+{
+	GENERATED_BODY()
+public:
+	
+	UPROPERTY(BlueprintReadWrite)
+	ASFCharacter* Character;
+
+	UPROPERTY(BlueprintReadWrite)
+	FName ID;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 MaxHP;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 HP;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 ATK;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 DEF;
+
+	// 현재 버프 관련 데이터도 추가 
+
+
+	// 현재 스킬 관련 , 시퀀스 카운터
+
+};
+
+
+class ASFCharacter;
+
 UCLASS(Blueprintable)
 class SOCKETFIGHTERS_API ASFCombatGameModeBase : public ASocketFightersGameModeBase
 {
@@ -43,8 +78,17 @@ public:
 	virtual void StartPlay() override;
 
 
+	void OnEncounterEnemy();
+	void OnPlayerDead();
+
+	UFUNCTION(BlueprintCallable)
+	void OnEnemyDead();
+
+
 private:
-	void InitCharacter();
+	void InitPlayerCharacter();
+
+	void InitEnemyCharacter();
 
 public:
 
@@ -68,4 +112,17 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	ASFCharacter* EnemyCharacter;
+
+	UPROPERTY(BlueprintReadWrite)
+	FCombatCharacterData MyCharacterCombatData;
+
+	UPROPERTY(BlueprintReadWrite)
+	FCombatCharacterData EnemyCombatData;
+
+
+	UPROPERTY()
+	int32 MaxEnemyCounter;
+
+	UPROPERTY()
+	int32 CurrentEnemyCounter;
 };

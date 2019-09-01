@@ -4,7 +4,12 @@
 #include "SFCombatLevelScriptActor.h"
 
 
-ASFCharacter* ASFCombatLevelScriptActor::SpawnCharacter(FCharacterInstanceData InData)
+ASFCharacter* ASFCombatLevelScriptActor::SpawnCharacter(FName CharacterID)
 {
-	return TestSpawnBIE(InData);
+	return TestSpawnBIE(CharacterID);
+}
+
+ASFCharacter* ASFCombatLevelScriptActor::SpawnEnemyCharacter(FName CharacterID)
+{
+	return SpawnEnemyCharacterBIE(CharacterID);
 }

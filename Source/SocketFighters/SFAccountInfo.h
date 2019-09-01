@@ -78,4 +78,10 @@ public:
 	UPROPERTY()
 	int64 UIDCounter;
 
+	UPROPERTY()
+	int64 SelectedCharacterUID;
+
+	UPROPERTY()
+	FName SelectedStageID;
+
 };

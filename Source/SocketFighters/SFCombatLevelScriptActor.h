@@ -16,10 +16,16 @@ class SOCKETFIGHTERS_API ASFCombatLevelScriptActor : public ALevelScriptActor
 public:
 	
 	UFUNCTION(BlueprintCallable)
-	ASFCharacter* SpawnCharacter(FCharacterInstanceData InData);
+	ASFCharacter* SpawnCharacter(FName CharacterID);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	ASFCharacter* TestSpawnBIE(FCharacterInstanceData InData);
+	ASFCharacter* TestSpawnBIE(FName CharacterID);
+
+	UFUNCTION(BlueprintCallable)
+	ASFCharacter* SpawnEnemyCharacter(FName CharacterID);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	ASFCharacter* SpawnEnemyCharacterBIE(FName CharacterID);
 
 
 public:	

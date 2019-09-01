@@ -49,7 +49,7 @@ void USFGameInstanceSubsystem::LoadAccountInfo()
 
 void USFGameInstanceSubsystem::EnterStage(FName InStageID)
 {
-	StageID = InStageID;
+	GDATA->AccountInfo->SelectedStageID = InStageID;
 
 	auto StageData = GDATA->GetStageData(InStageID);
 	ensure(StageData != nullptr);
