@@ -55,6 +55,7 @@ void UStaticDataAccessor::InitStaticData()
 	BeltTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/BeltTable.BeltTable"));
 	NPCTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/NPCTable.NPCTable"));
 	StageTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/StageTable.StageTable"));
+	SkillEffectTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/SkillEffectTable.SkillEffectTable"));
 }
 
 
@@ -123,6 +124,12 @@ FNPCDataRow* UStaticDataAccessor::GetNPCData(FName InID)
 FStageDataRow* UStaticDataAccessor::GetStageData(FName InID)
 {
 	return StageTable->FindRow<FStageDataRow>(InID, nullptr);
+}
+
+
+FSkillEffectDataRow* UStaticDataAccessor::GetSkillEffectData(FName InID)
+{
+	return SkillEffectTable->FindRow<FSkillEffectDataRow>(InID, nullptr);
 }
 
 

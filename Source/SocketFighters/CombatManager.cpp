@@ -4,63 +4,94 @@
 #include "CombatManager.h"
 #include "Common.h"
 #include "SFAccountInfo.h"
+#include "Animation/AnimMontage.h"
+#include "SFCharacter.h"
+
+
+
+
+void UCombatManager::ActivateCombat(FCombatCharacterData* InMyData, FCombatCharacterData* InEnemyData)
+{
+	MyData = InMyData;
+	EnemyData = InEnemyData;
+
+	bTickEnabled = true;
+	ProcessNextTurn();
+}
+
+
+void UCombatManager::DeactivateCombat()
+{
+	MyData = nullptr;
+	EnemyData = nullptr;
+
+	bTickEnabled = false;
+}
+
 
 
 void UCombatManager::Tick(float DeltaTime)
 {
-	
+	CurrentTickTime += DeltaTime;
+	if (CurrentTickTime >= TurnDelay)
+	{
+		CurrentTickTime -= TurnDelay;
+		ProcessNextTurn();
+	}
 }
 
 
-TStatId UCombatManager::GetStatId() const
+void UCombatManager::CheckTriggerSkill(FCombatCharacterData* InData, int32 TurnIndex)
 {
-	return TStatId();
-
+	FName* SkillID = InData->SkillQueue.Find(TurnIndex);
+	if (SkillID != nullptr)
+	{
+		InData->SkillSequenceCounter = 0;
+		InData->LastSkillID = *SkillID;
+		UAnimMontage** Anim = InData->Character->SkillAnims.Find(*SkillID);
+		if (Anim != nullptr)
+		{
+			InData->Character->PlayAnimMontage(*Anim);
+		}
+	}
 }
 
 
-void UCombatManager::InitMyCharacter(int64 CharacterUID)
+void UCombatManager::ProcessNextTurn()
 {
-	auto CharData = GDATA->AccountInfo->GetCharacterInstanceData(CharacterUID);
-	auto* CharStaticData = GDATA->GetCharacterData(CharData.ID);
+	CheckTriggerSkill(MyData, CurrentTurnIndex);
+	CheckTriggerSkill(EnemyData, CurrentTurnIndex);
 
-	auto LVData = CharStaticData->LevelData[CharData.Level];
-
-	MyCharacter.HP = MyCharacter.MaxHP = LVData.HP;
-	MyCharacter.ATK = LVData.Attack;
-	MyCharacter.DEF = LVData.Defense;
-
-
-	
-
-}
-
-
-void UCombatManager::InitEnemyCharacter(FName NPCID)
-{
-
-}
-
-
-void UCombatManager::ActivateSkill(ASFCharacter* InCharacter)
-{
-	//FCharacterCombatData& CombatData = GetCombatData(InCharacter);
+	++CurrentTurnIndex;
 }
 
 
 void UCombatManager::TriggerSkillSequence(ASFCharacter* InCharacter)
 {
-	FCharacterCombatData& CombatData = GetCombatData(InCharacter);
-	
-	//GDATA->AccountInfo->GetSkillInstanceData(CombatData.CurrentSkillUID);
+	FCombatCharacterData* CombatData = GetCombatData(InCharacter);
+	ensure(CombatData != nullptr);
 
+	auto SkillDataPtr = GDATA->GetMainSkillData(CombatData->LastSkillID);
+	FName SequenceID = SkillDataPtr->SkillSequenceIDs[CombatData->SkillSequenceCounter];
+
+	auto EffectData = GDATA->GetSkillEffectData(SequenceID);
+	   
+	// trigger sequence
+	if (EffectData != nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::White,
+			FString::Printf(TEXT("%s : %f, %f, %f"), *SequenceID.ToString(), EffectData->Param1, EffectData->Param2, EffectData->Param3), false);
+	}
+
+	
+	++(CombatData->SkillSequenceCounter);
 }
 
 
-FCharacterCombatData& UCombatManager::GetCombatData(ASFCharacter* InCharacter)
+FCombatCharacterData* UCombatManager::GetCombatData(ASFCharacter* InCharacter)
 {
-	if (InCharacter == MyCharacter.Character)
-		return MyCharacter;
+	if (InCharacter == MyData->Character)
+		return MyData;
 
-	return EnemyCharacter;
+	return EnemyData;
 }

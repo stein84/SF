@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Engine.h"
 #include "CoreMinimal.h"
 #include "AssertionMacros.h"
 #include "Classes/Engine/DataTable.h"
@@ -10,6 +11,8 @@
 /**
  * 
  */
+
+
 
 USTRUCT(BlueprintType)
 struct FCharacterDataRow : public FTableRowBase
@@ -136,6 +139,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FMainSkillSocketData> Sockets;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FName> SkillSequenceIDs;
 };
 
 
@@ -411,6 +417,7 @@ public:
 	FBeltDataRow* GetBeltData(FName InID);
 	FNPCDataRow* GetNPCData(FName InID);
 	FStageDataRow* GetStageData(FName InID);
+	FSkillEffectDataRow* GetSkillEffectData(FName InID);
 	
 private:
 	void InitStaticData();
@@ -430,6 +437,8 @@ public:
 	UDataTable* NPCTable;
 	UPROPERTY(BlueprintReadOnly)
 	UDataTable* StageTable;
+	UPROPERTY(BlueprintReadOnly)
+	UDataTable* SkillEffectTable;
 
 	UPROPERTY(BlueprintReadOnly)
 	class USFAccountInfo* AccountInfo;

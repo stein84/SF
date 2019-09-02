@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Common.h"
 #include "SocketFightersGameModeBase.h"
+#include "CombatManager.h"
 #include "SFCombatGameModeBase.generated.h"
 
 
@@ -33,37 +34,6 @@
 class ASFCharacter;
 
 
-USTRUCT(BlueprintType)
-struct FCombatCharacterData
-{
-	GENERATED_BODY()
-public:
-	
-	UPROPERTY(BlueprintReadWrite)
-	ASFCharacter* Character;
-
-	UPROPERTY(BlueprintReadWrite)
-	FName ID;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 MaxHP;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 HP;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 ATK;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 DEF;
-
-	// 현재 버프 관련 데이터도 추가 
-
-
-	// 현재 스킬 관련 , 시퀀스 카운터
-
-};
-
 
 class ASFCharacter;
 
@@ -84,6 +54,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnEnemyDead();
 
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerSkillQueue(int32 Index, FName SkillID);
+
+	UFUNCTION(BlueprintCallable)
+	void SetEnemySkillQueue(int32 Index, FName SkillID);
+
 
 private:
 	void InitPlayerCharacter();
@@ -93,7 +69,7 @@ private:
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	class UCombatManager* CombatManager;
+	UCombatManager* CombatManager;
 
 	UPROPERTY(BlueprintReadWrite)
 	FStageDataRow MyStageData;

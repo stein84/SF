@@ -34,6 +34,9 @@ void ASFCombatGameModeBase::StartPlay()
 	MaxEnemyCounter = MyStageData.NPCSet.Num();
 	CurrentEnemyCounter = 0;
 	InitEnemyCharacter();
+
+	// test
+	OnEncounterEnemy();
 }
 
 
@@ -58,7 +61,7 @@ void ASFCombatGameModeBase::InitPlayerCharacter()
 void ASFCombatGameModeBase::OnEncounterEnemy()
 {
 	// 컴뱃 매니져 초기화, 전투 시작 로직 
-
+	CombatManager->ActivateCombat(&MyCharacterCombatData, &EnemyCombatData);
 }
 
 
@@ -99,6 +102,21 @@ void ASFCombatGameModeBase::InitEnemyCharacter()
 	EnemyCombatData.DEF = EnemyData->DEF;
 
 	EnemyCharacter = MyLevelScript->SpawnEnemyCharacter(EnemyID);
+	EnemyCombatData.Character = EnemyCharacter; 
 
 	++CurrentEnemyCounter;
+}
+
+
+void ASFCombatGameModeBase::SetPlayerSkillQueue(int32 Index, FName SkillID)
+{
+	MyCharacterCombatData.SkillQueue.FindOrAdd(Index);
+	MyCharacterCombatData.SkillQueue[Index] = SkillID;
+}
+
+
+void ASFCombatGameModeBase::SetEnemySkillQueue(int32 Index, FName SkillID)
+{
+	EnemyCombatData.SkillQueue.FindOrAdd(Index);
+	EnemyCombatData.SkillQueue[Index] = SkillID;
 }

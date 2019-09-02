@@ -19,18 +19,18 @@ class ASFCharacter;
  */
 
 
-// 캐릭터 인스턴스 / NPC 정보를 통해 초기화한다
-// 스킬 정보는 들고있을 필요 없고, 벨트에 실제 등록된 애들의 스태틱 데이터만을 가져온다
-
 
 USTRUCT(BlueprintType)
-struct FCharacterCombatData
+struct FCombatCharacterData
 {
 	GENERATED_BODY()
 public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	ASFCharacter* Character;
+
+	UPROPERTY(BlueprintReadWrite)
+	FName ID;
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 MaxHP;
@@ -46,7 +46,16 @@ public:
 
 	// 현재 버프 관련 데이터도 추가 
 
-	// 현재 스킬 관련 , 시퀀스 카운터
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 SkillSequenceCounter;
+
+	// 스킬 큐
+	UPROPERTY(BlueprintReadWrite)
+	TMap<int32, FName> SkillQueue;
+
+	UPROPERTY(BlueprintReadWrite)
+	FName LastSkillID;
 
 };
 
@@ -58,38 +67,44 @@ class SOCKETFIGHTERS_API UCombatManager : public UObject, public FTickableGameOb
 	GENERATED_BODY()
 public:
 
-	UFUNCTION(BlueprintCallable)
-	void InitMyCharacter(int64 CharacterUID);
-
-	UFUNCTION(BlueprintCallable)
-	void InitEnemyCharacter(FName NPCID);
-
-	UFUNCTION(BlueprintCallable)
-	void ActivateSkill(ASFCharacter* InCharacter);
-
+	void ActivateCombat(FCombatCharacterData* InMyData, FCombatCharacterData* InEnemyData);
+	void DeactivateCombat();
 
 	UFUNCTION(BlueprintCallable)
 	void TriggerSkillSequence(ASFCharacter* InCharacter);
 	
-	FCharacterCombatData& GetCombatData(ASFCharacter* InCharacter);
+	
 
 
 	// Begin FTickableGameObject implementation
-	virtual ETickableTickType GetTickableTickType() const override { return ETickableTickType::Always; }
+	virtual ETickableTickType GetTickableTickType() const override { return ETickableTickType::Conditional; }
 	virtual bool IsTickableWhenPaused() const override { return false; }
 	virtual bool IsTickableInEditor() const override { return true; }
+	virtual bool IsTickable() const override { return bTickEnabled; }
+	virtual TStatId GetStatId() const { return TStatId(); }
 	virtual void Tick(float DeltaTime) override;
-	virtual TStatId GetStatId() const;
 	// End FTickableGameObject implementation
 
+private:
+
+	FCombatCharacterData* GetCombatData(ASFCharacter* InCharacter);
+	void ProcessNextTurn();
+	void CheckTriggerSkill(FCombatCharacterData* InData, int32 TurnIndex);
 
 public:
-
-	UPROPERTY(BlueprintReadWrite)
-	FCharacterCombatData MyCharacter;
-
-	UPROPERTY(BlueprintReadOnly)
-	FCharacterCombatData EnemyCharacter;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float TurnDelay = 3.f;
 	
+
+private:
+
+	FCombatCharacterData* MyData = nullptr;
+	FCombatCharacterData* EnemyData = nullptr;
+
+	UPROPERTY()
+	bool bTickEnabled = false;
+
+	float CurrentTickTime = 0.f;
+	int32 CurrentTurnIndex = 0;
 };
