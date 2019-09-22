@@ -13,6 +13,37 @@
  */
 
 
+static const int32 MAX_TURN = 5;
+
+
+UENUM(BlueprintType)
+enum class ESkillEffect : uint8
+{
+	Attack_Type0,
+	Attack_Type1,
+	Attack_Type2,
+};
+
+
+USTRUCT(BlueprintType)
+struct FSkillEffectData
+{
+public:
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	ESkillEffect EffectID;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Param1;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Param2;
+
+	UPROPERTY(EditDefaultsOnly)
+	float Param3;
+};
+
 
 USTRUCT(BlueprintType)
 struct FCharacterDataRow : public FTableRowBase
@@ -142,6 +173,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FName> SkillSequenceIDs;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FSkillEffectData> SkillSequence;
 };
 
 
@@ -365,6 +399,35 @@ public:
 };
 
 
+
+
+USTRUCT(BlueprintType)
+struct FDamageData
+{
+	GENERATED_BODY()
+public:
+
+	FDamageData() 
+	: ArmorPenetration(0.f), BuffType(NAME_None) {}
+
+	// FName들은 나중에 enum화 
+
+	UPROPERTY(BlueprintReadWrite)
+	FName DamageType;
+
+	UPROPERTY(BlueprintReadWrite)
+	float DefaultDamage;
+
+	UPROPERTY(BlueprintReadWrite)
+	float ArmorPenetration;
+
+	UPROPERTY(BlueprintReadWrite)
+	FName BuffType;
+
+	UPROPERTY(BlueprintReadWrite)
+	float BuffWeight;
+
+};
 
 
 UCLASS(BlueprintType)

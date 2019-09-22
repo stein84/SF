@@ -6,6 +6,7 @@
 #include "SFAccountInfo.h"
 #include "Animation/AnimMontage.h"
 #include "SFCharacter.h"
+#include "SFCombatGameModeBase.h"
 
 
 
@@ -14,6 +15,9 @@ void UCombatManager::ActivateCombat(FCombatCharacterData* InMyData, FCombatChara
 {
 	MyData = InMyData;
 	EnemyData = InEnemyData;
+
+	MyData->Character->SetEnemy(EnemyData->Character);
+	EnemyData->Character->SetEnemy(MyData->Character);
 
 	bTickEnabled = true;
 	ProcessNextTurn();
@@ -26,8 +30,33 @@ void UCombatManager::DeactivateCombat()
 	EnemyData = nullptr;
 
 	bTickEnabled = false;
+	CurrentTickTime = 0.f;
+	CurrentTurnIndex = 0;
 }
 
+
+ASFCharacter* UCombatManager::GetPlayerCharacter()
+{
+	return MyData == nullptr ? nullptr : MyData->Character;
+}
+
+
+ASFCharacter* UCombatManager::GetEnemyCharacter()
+{
+	return EnemyData == nullptr ? nullptr : EnemyData->Character;
+}
+
+
+TMap<int32, FName> UCombatManager::GetPlayerSkillQueue()
+{
+	return MyData == nullptr ? TMap<int32, FName>() : MyData->SkillQueue;
+}
+
+
+TMap<int32, FName> UCombatManager::GetEnemySkillQueue()
+{
+	return EnemyData == nullptr ? TMap<int32, FName>() : EnemyData->SkillQueue;
+}
 
 
 void UCombatManager::Tick(float DeltaTime)
@@ -35,8 +64,11 @@ void UCombatManager::Tick(float DeltaTime)
 	CurrentTickTime += DeltaTime;
 	if (CurrentTickTime >= TurnDelay)
 	{
-		CurrentTickTime -= TurnDelay;
-		ProcessNextTurn();
+		if (!IsSkillPlaying())
+		{
+			CurrentTickTime = 0.f;
+			ProcessNextTurn();
+		}	
 	}
 }
 
@@ -46,13 +78,7 @@ void UCombatManager::CheckTriggerSkill(FCombatCharacterData* InData, int32 TurnI
 	FName* SkillID = InData->SkillQueue.Find(TurnIndex);
 	if (SkillID != nullptr)
 	{
-		InData->SkillSequenceCounter = 0;
-		InData->LastSkillID = *SkillID;
-		UAnimMontage** Anim = InData->Character->SkillAnims.Find(*SkillID);
-		if (Anim != nullptr)
-		{
-			InData->Character->PlayAnimMontage(*Anim);
-		}
+		InData->Character->PlaySkill(*SkillID);
 	}
 }
 
@@ -63,35 +89,15 @@ void UCombatManager::ProcessNextTurn()
 	CheckTriggerSkill(EnemyData, CurrentTurnIndex);
 
 	++CurrentTurnIndex;
-}
-
-
-void UCombatManager::TriggerSkillSequence(ASFCharacter* InCharacter)
-{
-	FCombatCharacterData* CombatData = GetCombatData(InCharacter);
-	ensure(CombatData != nullptr);
-
-	auto SkillDataPtr = GDATA->GetMainSkillData(CombatData->LastSkillID);
-	FName SequenceID = SkillDataPtr->SkillSequenceIDs[CombatData->SkillSequenceCounter];
-
-	auto EffectData = GDATA->GetSkillEffectData(SequenceID);
-	   
-	// trigger sequence
-	if (EffectData != nullptr)
+	if (CurrentTurnIndex == MAX_TURN)
 	{
-		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.0f, FColor::White,
-			FString::Printf(TEXT("%s : %f, %f, %f"), *SequenceID.ToString(), EffectData->Param1, EffectData->Param2, EffectData->Param3), false);
+		// 다음 사이클 
+		CurrentTurnIndex = 0;
 	}
-
-	
-	++(CombatData->SkillSequenceCounter);
 }
 
 
-FCombatCharacterData* UCombatManager::GetCombatData(ASFCharacter* InCharacter)
+bool UCombatManager::IsSkillPlaying()
 {
-	if (InCharacter == MyData->Character)
-		return MyData;
-
-	return EnemyData;
+	return MyData->Character->IsPlayingSkill() || EnemyData->Character->IsPlayingSkill();
 }

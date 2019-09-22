@@ -19,46 +19,18 @@ class ASFCharacter;
  */
 
 
-
 USTRUCT(BlueprintType)
 struct FCombatCharacterData
 {
 	GENERATED_BODY()
 public:
-	
+
 	UPROPERTY(BlueprintReadWrite)
 	ASFCharacter* Character;
 
 	UPROPERTY(BlueprintReadWrite)
-	FName ID;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 MaxHP;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 HP;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 ATK;
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 DEF;
-
-	// 현재 버프 관련 데이터도 추가 
-
-
-	UPROPERTY(BlueprintReadWrite)
-	int32 SkillSequenceCounter;
-
-	// 스킬 큐
-	UPROPERTY(BlueprintReadWrite)
 	TMap<int32, FName> SkillQueue;
-
-	UPROPERTY(BlueprintReadWrite)
-	FName LastSkillID;
-
 };
-
 
 
 UCLASS(BlueprintType)
@@ -70,10 +42,17 @@ public:
 	void ActivateCombat(FCombatCharacterData* InMyData, FCombatCharacterData* InEnemyData);
 	void DeactivateCombat();
 
-	UFUNCTION(BlueprintCallable)
-	void TriggerSkillSequence(ASFCharacter* InCharacter);
+	UFUNCTION(BlueprintPure)
+	ASFCharacter* GetPlayerCharacter();
+
+	UFUNCTION(BlueprintPure)
+	ASFCharacter* GetEnemyCharacter();
 	
-	
+	UFUNCTION(BlueprintPure)
+	TMap<int32, FName> GetPlayerSkillQueue();
+
+	UFUNCTION(BlueprintPure)
+	TMap<int32, FName> GetEnemySkillQueue();
 
 
 	// Begin FTickableGameObject implementation
@@ -85,17 +64,21 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	// End FTickableGameObject implementation
 
+
 private:
 
-	FCombatCharacterData* GetCombatData(ASFCharacter* InCharacter);
 	void ProcessNextTurn();
 	void CheckTriggerSkill(FCombatCharacterData* InData, int32 TurnIndex);
+	bool IsSkillPlaying();
+
 
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TurnDelay = 3.f;
+	float TurnDelay = 1.f;
 	
+	UPROPERTY(BlueprintReadOnly)
+	int32 CurrentTurnIndex = 0;
 
 private:
 
@@ -106,5 +89,5 @@ private:
 	bool bTickEnabled = false;
 
 	float CurrentTickTime = 0.f;
-	int32 CurrentTurnIndex = 0;
+	
 };

@@ -8,6 +8,7 @@
 #include "SFCombatLevelScriptActor.h"
 #include "SFGameInstanceSubsystem.h"
 #include "GameFramework/Actor.h"
+#include "SFCharacter.h"
 
 
 ASFCombatGameModeBase::ASFCombatGameModeBase(const FObjectInitializer& ObjectInitializer)
@@ -30,10 +31,8 @@ void ASFCombatGameModeBase::StartPlay()
 	ensure(MyGameInstance != nullptr);
 
 	InitPlayerCharacter();
-
-	MaxEnemyCounter = MyStageData.NPCSet.Num();
-	CurrentEnemyCounter = 0;
-	InitEnemyCharacter();
+	InitEnemyData();
+	SpawnNextEnemy();
 
 	// test
 	OnEncounterEnemy();
@@ -48,34 +47,37 @@ void ASFCombatGameModeBase::InitPlayerCharacter()
 	auto* CharStaticData = GDATA->GetCharacterData(MyCharacterData.ID);
 	auto LVData = CharStaticData->LevelData[MyCharacterData.Level];
 
-	MyCharacterCombatData.ID = MyCharacterData.ID;
-	MyCharacterCombatData.HP = MyCharacterCombatData.MaxHP = LVData.HP;
-	MyCharacterCombatData.ATK = LVData.Attack;
-	MyCharacterCombatData.DEF = LVData.Defense;
-
-	MyCharacter = MyLevelScript->SpawnCharacter(MyCharacterData.ID);
-	MyCharacterCombatData.Character = MyCharacter;
+	MyCombatData.Character = MyLevelScript->SpawnCharacter(MyCharacterData.ID);
+	MyCombatData.Character->SetupCombatData(LVData);
+	MyCombatData.Character->OnCharacterDead.BindDynamic(this, &ASFCombatGameModeBase::OnPlayerDead);
 }
 
 
 void ASFCombatGameModeBase::OnEncounterEnemy()
 {
 	// 컴뱃 매니져 초기화, 전투 시작 로직 
-	CombatManager->ActivateCombat(&MyCharacterCombatData, &EnemyCombatData);
+	CombatManager->ActivateCombat(&MyCombatData, &EnemyCombatData);
+
+	EnterCombat();
 }
 
 
 void ASFCombatGameModeBase::OnPlayerDead()
 {
 	// 스테이지 실패 처리 
-
+	CombatManager->DeactivateCombat();
 }
 
 
 void ASFCombatGameModeBase::OnEnemyDead()
 {
 	// 전투 종료 로직
+	CombatManager->DeactivateCombat();
 
+	EnemyCombatData.Character = nullptr;
+	EnemyCombatData.SkillQueue.Reset();
+
+	MyCombatData.Character->StopAction();
 
 	if (CurrentEnemyCounter == MaxEnemyCounter)
 	{
@@ -83,26 +85,31 @@ void ASFCombatGameModeBase::OnEnemyDead()
 
 		return;
 	}
+	
+	SpawnNextEnemy();
 
-	InitEnemyCharacter();
+	// 임시
+	OnEncounterEnemy();
 }
 
 
-void ASFCombatGameModeBase::InitEnemyCharacter()
+void ASFCombatGameModeBase::InitEnemyData()
+{
+	MaxEnemyCounter = MyStageData.NPCSet.Num();
+	CurrentEnemyCounter = 0;	
+}
+
+
+void ASFCombatGameModeBase::SpawnNextEnemy()
 {
 	ensure(CurrentEnemyCounter < MaxEnemyCounter);
 	FName EnemyID = MyStageData.NPCSet[CurrentEnemyCounter];
-
 	FNPCDataRow* EnemyData = GDATA->GetNPCData(EnemyID);
 	ensure(EnemyData != nullptr);
 
-	EnemyCombatData.ID = EnemyID;
-	EnemyCombatData.HP = EnemyCombatData.MaxHP = EnemyData->HP;
-	EnemyCombatData.ATK = EnemyData->ATK;
-	EnemyCombatData.DEF = EnemyData->DEF;
-
-	EnemyCharacter = MyLevelScript->SpawnEnemyCharacter(EnemyID);
-	EnemyCombatData.Character = EnemyCharacter; 
+	EnemyCombatData.Character = MyLevelScript->SpawnEnemyCharacter(EnemyID);
+	EnemyCombatData.Character->SetupCombatData(EnemyData);
+	EnemyCombatData.Character->OnCharacterDead.BindDynamic(this, &ASFCombatGameModeBase::OnEnemyDead);
 
 	++CurrentEnemyCounter;
 }
@@ -110,8 +117,8 @@ void ASFCombatGameModeBase::InitEnemyCharacter()
 
 void ASFCombatGameModeBase::SetPlayerSkillQueue(int32 Index, FName SkillID)
 {
-	MyCharacterCombatData.SkillQueue.FindOrAdd(Index);
-	MyCharacterCombatData.SkillQueue[Index] = SkillID;
+	MyCombatData.SkillQueue.FindOrAdd(Index);
+	MyCombatData.SkillQueue[Index] = SkillID;
 }
 
 
