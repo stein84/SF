@@ -56,6 +56,7 @@ void UStaticDataAccessor::InitStaticData()
 	NPCTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/NPCTable.NPCTable"));
 	StageTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/StageTable.StageTable"));
 	SkillEffectTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/SkillEffectTable.SkillEffectTable"));
+	IconTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Game/Data/IconTable.IconTable"));
 }
 
 
@@ -130,6 +131,13 @@ FStageDataRow* UStaticDataAccessor::GetStageData(FName InID)
 FSkillEffectDataRow* UStaticDataAccessor::GetSkillEffectData(FName InID)
 {
 	return SkillEffectTable->FindRow<FSkillEffectDataRow>(InID, nullptr);
+}
+
+
+UTexture2D* UStaticDataAccessor::GetIcon(FName InID)
+{
+	FIconData* Data = IconTable->FindRow<FIconData>(InID, nullptr);
+	return Data == nullptr ? nullptr : Data->IconTex;
 }
 
 

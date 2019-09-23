@@ -49,6 +49,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetEnemySkillQueue(int32 Index, FName SkillID);
 
+
+	// UI 초기화때문에 임시로 BIE 사용
 	UFUNCTION(BlueprintImplementableEvent)
 	void EnterCombat();
 

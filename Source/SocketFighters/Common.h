@@ -430,6 +430,17 @@ public:
 };
 
 
+USTRUCT(BlueprintType)
+struct FIconData : public FTableRowBase
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	class UTexture2D* IconTex;
+};
+
+
 UCLASS(BlueprintType)
 class SOCKETFIGHTERS_API UStaticDataAccessor : public UObject
 {
@@ -474,12 +485,16 @@ public:
 	UFUNCTION(BlueprintPure)
 	FBeltDataRow GetBeltData_BP(FName InID);
 
+	UFUNCTION(BlueprintPure)
+	class UTexture2D* GetIcon(FName InID);
+
 	FCharacterStaticData* GetCharacterData(FName InID);
 	FMainSkillDataRow* GetMainSkillData(FName InID);
 	FSocketSkillDataRow* GetSocketSkillData(FName InID);
 	FBeltDataRow* GetBeltData(FName InID);
 	FNPCDataRow* GetNPCData(FName InID);
 	FStageDataRow* GetStageData(FName InID);
+	
 	FSkillEffectDataRow* GetSkillEffectData(FName InID);
 	
 private:
@@ -502,6 +517,8 @@ public:
 	UDataTable* StageTable;
 	UPROPERTY(BlueprintReadOnly)
 	UDataTable* SkillEffectTable;
+	UPROPERTY(BlueprintReadOnly)
+	UDataTable* IconTable;
 
 	UPROPERTY(BlueprintReadOnly)
 	class USFAccountInfo* AccountInfo;
