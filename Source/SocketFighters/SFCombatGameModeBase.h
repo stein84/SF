@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Common.h"
-#include "SocketFightersGameModeBase.h"
-#include "CombatManager.h"
 #include "Platform.h"
+#include "SocketFightersGameModeBase.h"
 #include "SFCombatGameModeBase.generated.h"
 
 
@@ -54,7 +53,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void EnterCombat();
 
-
+	void OnCombatDeactivated();
 
 private:
 	
@@ -73,7 +72,7 @@ private:
 public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UCombatManager* CombatManager;
+	class UCombatManager* CombatManager;
 
 	UPROPERTY(BlueprintReadWrite)
 	class ASFCombatLevelScriptActor* MyLevelScript;

@@ -543,3 +543,21 @@ public:
 	Common();
 	~Common();
 };
+
+
+
+USTRUCT(BlueprintType)
+struct FCombatCharacterData
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(BlueprintReadWrite)
+	class ASFCharacter* Character;
+
+	UPROPERTY(BlueprintReadWrite)
+	TMap<int32, FName> SkillQueue;
+
+	UPROPERTY(BlueprintReadWrite)
+	TMap<int32, FName> NextQueue;
+};

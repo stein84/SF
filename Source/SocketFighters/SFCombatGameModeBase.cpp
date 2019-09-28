@@ -15,13 +15,14 @@ ASFCombatGameModeBase::ASFCombatGameModeBase(const FObjectInitializer& ObjectIni
 	: Super(ObjectInitializer)
 {
 	CombatManager = CreateDefaultSubobject<UCombatManager>(TEXT("CmbMgr"));
-
+	CombatManager->bEditableWhenInherited = true;
 }
 
 
 void ASFCombatGameModeBase::StartPlay()
 {
 	Super::StartPlay();
+	CombatManager->MyGameMode = this;
 
 	MyLevelScript = Cast<ASFCombatLevelScriptActor>(GetWorld()->GetLevelScriptActor());
 	ensure(MyLevelScript != nullptr);
@@ -58,7 +59,7 @@ void ASFCombatGameModeBase::OnEncounterEnemy()
 	// 컴뱃 매니져 초기화, 전투 시작 로직 
 	CombatManager->ActivateCombat(&MyCombatData, &EnemyCombatData);
 
-	EnterCombat();
+	//EnterCombat();
 }
 
 
@@ -71,21 +72,24 @@ void ASFCombatGameModeBase::OnPlayerDead()
 
 void ASFCombatGameModeBase::OnEnemyDead()
 {
-	// 전투 종료 로직
-	CombatManager->DeactivateCombat();
+	MyCombatData.Character->StopAction();
 
 	EnemyCombatData.Character = nullptr;
 	EnemyCombatData.SkillQueue.Reset();
 
-	MyCombatData.Character->StopAction();
+	// 전투 종료 로직
+	CombatManager->DeactivateCombat();
+}
 
+void ASFCombatGameModeBase::OnCombatDeactivated()
+{
 	if (CurrentEnemyCounter == MaxEnemyCounter)
 	{
 		// 스테이지 클리어 
 
 		return;
 	}
-	
+
 	SpawnNextEnemy();
 
 	// 임시

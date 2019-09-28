@@ -6,10 +6,11 @@
 #include "UObject/NoExportTypes.h"
 #include "Tickable.h"
 #include "Common.h"
+#include "Components/ActorComponent.h"
 #include "CombatManager.generated.h"
 
 class ASFCharacter;
-
+class USFCombatWidget;
 
 /**
  * 
@@ -19,25 +20,13 @@ class ASFCharacter;
  */
 
 
-USTRUCT(BlueprintType)
-struct FCombatCharacterData
-{
-	GENERATED_BODY()
-public:
-
-	UPROPERTY(BlueprintReadWrite)
-	ASFCharacter* Character;
-
-	UPROPERTY(BlueprintReadWrite)
-	TMap<int32, FName> SkillQueue;
-};
-
 
 UCLASS(BlueprintType)
-class SOCKETFIGHTERS_API UCombatManager : public UObject, public FTickableGameObject
+class SOCKETFIGHTERS_API UCombatManager : public UActorComponent
 {
 	GENERATED_BODY()
 public:
+	UCombatManager(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	void ActivateCombat(FCombatCharacterData* InMyData, FCombatCharacterData* InEnemyData);
 	void DeactivateCombat();
@@ -54,18 +43,23 @@ public:
 	UFUNCTION(BlueprintPure)
 	TMap<int32, FName> GetEnemySkillQueue();
 
+	UFUNCTION(BlueprintCallable)
+	void OnActivateSequenceEnded();
+	
+	UFUNCTION(BlueprintCallable)
+	void OnDeactivateSequenceEnded();
 
-	// Begin FTickableGameObject implementation
-	virtual ETickableTickType GetTickableTickType() const override { return ETickableTickType::Conditional; }
-	virtual bool IsTickableWhenPaused() const override { return false; }
-	virtual bool IsTickableInEditor() const override { return true; }
-	virtual bool IsTickable() const override { return bTickEnabled; }
-	virtual TStatId GetStatId() const { return TStatId(); }
-	virtual void Tick(float DeltaTime) override;
-	// End FTickableGameObject implementation
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 
 private:
+
+	void PlayActivateSequence();
+	void PlayDeactivateSequence();
+
+	void InitUI();
+	void RemoveUI();
+
 
 	void ProcessNextTurn();
 	void CheckTriggerSkill(FCombatCharacterData* InData, int32 TurnIndex);
@@ -76,9 +70,18 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TurnDelay = 1.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UUserWidget> CombatUIClass;
 	
 	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentTurnIndex = 0;
+
+	UPROPERTY(BlueprintReadOnly)
+	USFCombatWidget* CombatUI;
+
+	UPROPERTY(BlueprintReadOnly)
+	class ASFCombatGameModeBase* MyGameMode;
 
 private:
 

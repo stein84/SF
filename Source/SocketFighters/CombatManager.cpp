@@ -7,9 +7,20 @@
 #include "Animation/AnimMontage.h"
 #include "SFCharacter.h"
 #include "SFCombatGameModeBase.h"
+#include "UserWidget.h"
+#include "SFCombatWidget.h"
 
 
 
+UCombatManager::UCombatManager(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	bAutoActivate = false;
+	PrimaryComponentTick.bTickEvenWhenPaused = false;
+	PrimaryComponentTick.bStartWithTickEnabled = false;
+	PrimaryComponentTick.bCanEverTick = true;
+
+}
 
 void UCombatManager::ActivateCombat(FCombatCharacterData* InMyData, FCombatCharacterData* InEnemyData)
 {
@@ -19,8 +30,7 @@ void UCombatManager::ActivateCombat(FCombatCharacterData* InMyData, FCombatChara
 	MyData->Character->SetEnemy(EnemyData->Character);
 	EnemyData->Character->SetEnemy(MyData->Character);
 
-	bTickEnabled = true;
-	ProcessNextTurn();
+	PlayActivateSequence();
 }
 
 
@@ -29,9 +39,57 @@ void UCombatManager::DeactivateCombat()
 	MyData = nullptr;
 	EnemyData = nullptr;
 
-	bTickEnabled = false;
+	Deactivate();
 	CurrentTickTime = 0.f;
 	CurrentTurnIndex = 0;
+	
+	PlayDeactivateSequence();
+}
+	
+
+
+void UCombatManager::PlayActivateSequence()
+{
+	InitUI();
+
+	// 나중에 delegate 처리
+	OnActivateSequenceEnded();
+}
+
+
+void UCombatManager::PlayDeactivateSequence()
+{
+	// 나중에 delegate 처리 
+	OnDeactivateSequenceEnded();
+}
+
+
+void UCombatManager::OnActivateSequenceEnded()
+{
+	Activate();
+	ProcessNextTurn();
+}
+
+
+void UCombatManager::OnDeactivateSequenceEnded()
+{
+	MyGameMode->OnCombatDeactivated();
+	RemoveUI();
+}
+
+
+void UCombatManager::InitUI()
+{
+	CombatUI = Cast<USFCombatWidget>(CreateWidget<UUserWidget, UWorld>(GetWorld(), CombatUIClass));
+	CombatUI->InitData(this, MyGameMode->MyCharacterData);
+	CombatUI->AddToViewport();
+}
+
+
+void UCombatManager::RemoveUI()
+{
+	CombatUI->RemoveFromViewport();
+	CombatUI = nullptr;
 }
 
 
@@ -56,20 +114,6 @@ TMap<int32, FName> UCombatManager::GetPlayerSkillQueue()
 TMap<int32, FName> UCombatManager::GetEnemySkillQueue()
 {
 	return EnemyData == nullptr ? TMap<int32, FName>() : EnemyData->SkillQueue;
-}
-
-
-void UCombatManager::Tick(float DeltaTime)
-{
-	CurrentTickTime += DeltaTime;
-	if (CurrentTickTime >= TurnDelay)
-	{
-		if (!IsSkillPlaying())
-		{
-			CurrentTickTime = 0.f;
-			ProcessNextTurn();
-		}	
-	}
 }
 
 
@@ -100,4 +144,20 @@ void UCombatManager::ProcessNextTurn()
 bool UCombatManager::IsSkillPlaying()
 {
 	return MyData->Character->IsPlayingSkill() || EnemyData->Character->IsPlayingSkill();
+}
+
+
+void UCombatManager::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	CurrentTickTime += DeltaTime;
+	if (CurrentTickTime >= TurnDelay)
+	{
+		if (!IsSkillPlaying())
+		{
+			CurrentTickTime = 0.f;
+			ProcessNextTurn();
+		}
+	}
 }
