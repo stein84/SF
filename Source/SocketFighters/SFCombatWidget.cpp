@@ -12,3 +12,15 @@ void USFCombatWidget::InitData(UCombatManager* InMgr, FCharacterInstanceData& In
 
 	OnInitData();
 }
+
+
+void USFCombatWidget::EnableInput()
+{
+	bInputEnabled = true;
+}
+
+
+void USFCombatWidget::DisableInput()
+{
+	bInputEnabled = false;
+}

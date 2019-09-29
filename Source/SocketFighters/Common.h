@@ -172,9 +172,6 @@ public:
 	TArray<FMainSkillSocketData> Sockets;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<FName> SkillSequenceIDs;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FSkillEffectData> SkillSequence;
 };
 
@@ -194,6 +191,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 Class;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FSkillEffectData> SkillSequence;
 };
 
 
@@ -550,6 +550,12 @@ USTRUCT(BlueprintType)
 struct FCombatCharacterData
 {
 	GENERATED_BODY()
+
+public:
+
+	void RegisterSkill(int32 Turn, FName SkillID);
+	void SwapToNextQueue();
+
 public:
 
 	UPROPERTY(BlueprintReadWrite)

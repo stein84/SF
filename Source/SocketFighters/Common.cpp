@@ -148,3 +148,14 @@ Common::Common()
 Common::~Common()
 {
 }
+
+void FCombatCharacterData::RegisterSkill(int32 Turn, FName SkillID)
+{
+
+}
+
+
+void FCombatCharacterData::SwapToNextQueue()
+{
+	SkillQueue = NextQueue;
+}

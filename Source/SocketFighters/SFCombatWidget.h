@@ -10,6 +10,18 @@
 
 class UCombatManager;
 
+USTRUCT(BlueprintType)
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(BlueprintReadWrite)
+	스킬 데이터 모아놓기
+
+
+}
+
+
 UCLASS(BlueprintType)
 class SOCKETFIGHTERS_API USFCombatWidget : public UUserWidget
 {
@@ -23,6 +35,18 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnInitData();
 
+	UPROPERTY(BlueprintReadWrite)
+	bool IsInputEnabled() { return bInputEnabled; }
+
+	void EnableInput();
+
+	UFUNCTION(BlueprintCallable)
+	void DisableInput();
+
+
+	UFUNCTION(BlueprintCallable)
+	void SkillSelected(int64 InUID);
+
 
 public:
 
@@ -31,4 +55,14 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	FCharacterInstanceData CharacterData;
+
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bInputEnabled = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	int64 SelectedSkillUID;
+
+private:
+	
 };

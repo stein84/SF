@@ -65,11 +65,18 @@ private:
 	void CheckTriggerSkill(FCombatCharacterData* InData, int32 TurnIndex);
 	bool IsSkillPlaying();
 
+	void NextCycle();
+
+	void EnableInput(bool bEnable);
+	void TickInputQueue(float DeltaTime);
 
 public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TurnDelay = 1.f;
+	float TurnDelay = 1.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InputDuration = 5.f;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> CombatUIClass;
@@ -82,6 +89,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	class ASFCombatGameModeBase* MyGameMode;
+
+	UPROPERTY(BlueprintReadWrite)
+	float RemainInputTime;
 
 private:
 

@@ -129,15 +129,15 @@ void UCombatManager::CheckTriggerSkill(FCombatCharacterData* InData, int32 TurnI
 
 void UCombatManager::ProcessNextTurn()
 {
+	if (CurrentTurnIndex == MAX_TURN)
+	{
+		NextCycle();
+	}
+
 	CheckTriggerSkill(MyData, CurrentTurnIndex);
 	CheckTriggerSkill(EnemyData, CurrentTurnIndex);
 
 	++CurrentTurnIndex;
-	if (CurrentTurnIndex == MAX_TURN)
-	{
-		// 다음 사이클 
-		CurrentTurnIndex = 0;
-	}
 }
 
 
@@ -151,6 +151,8 @@ void UCombatManager::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	TickInputQueue(DeltaTime);
+
 	CurrentTickTime += DeltaTime;
 	if (CurrentTickTime >= TurnDelay)
 	{
@@ -159,5 +161,44 @@ void UCombatManager::TickComponent(float DeltaTime, enum ELevelTick TickType, FA
 			CurrentTickTime = 0.f;
 			ProcessNextTurn();
 		}
+	}
+}
+
+
+void UCombatManager::NextCycle()
+{
+	// 다음 사이클 
+	CurrentTurnIndex = 0;
+
+	MyData->SwapToNextQueue();
+	EnemyData->SwapToNextQueue();
+	EnableInput(true);
+}
+
+
+void UCombatManager::EnableInput(bool bEnable)
+{
+	if (bEnable)
+	{
+		RemainInputTime = InputDuration;
+		CombatUI->EnableInput();
+	}
+	else
+	{
+		RemainInputTime = 0.f;
+		CombatUI->DisableInput();
+	}
+}
+
+
+void UCombatManager::TickInputQueue(float DeltaTime)
+{
+	if (!CombatUI->IsInputEnabled())
+		return;
+
+	RemainInputTime -= DeltaTime;
+	if (RemainInputTime <= 0.f)
+	{
+		EnableInput(false);
 	}
 }
